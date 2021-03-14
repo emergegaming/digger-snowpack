@@ -4,13 +4,13 @@
     "description": "Digger packaged with snowpack - no fancy dependencies",
     "main": "js/index.js",
     "scripts": {
-        "start": "snowpack dev",
-        "build": "snowpack build",
+        "start": "http-server",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "",
     "license": "ISC",
     "devDependencies": {
-        "snowpack": "^3.0.13"
+        "snowpack": "^3.0.13",
+        "http-server": "^0.12.3"
     }
 }
