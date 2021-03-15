@@ -25,6 +25,7 @@ let screenshot = null;
 let screenshotsMissed = null;
 
 let ci = {};
+let loadedCallback = function() {}
 
 const handleTouchEvent = (event) => {
     if (event.type === 'touchstart') {
@@ -68,6 +69,7 @@ const handleTouchEvent = (event) => {
             }
         }
     } else if (event.type === 'touchmove') {
+        console.time('touch')
         for (let i = 0; i < event.changedTouches.length; i++) {
             let moving = event.changedTouches[i];
             if (moving.clientX < 200) {
@@ -106,7 +108,7 @@ const handleTouchEvent = (event) => {
 
                 processDirectionChange(lastDirection, control)
                 lastDirection = control;
-
+                console.timeEnd("touch")
             }
         }
     }
@@ -201,6 +203,10 @@ const isTouch = () => {
         (navigator.msMaxTouchPoints > 0));
 }
 
+export const loadingComplete = (callback) => {
+    loadedCallback = callback;
+}
+
 
 const dosReady = () => {
     console.log ("Referencing controls");
@@ -211,6 +217,7 @@ const dosReady = () => {
 
     console.log ("Setting up scoring")
     setupScreenPoll();
+    if (loadedCallback) loadedCallback();
 }
 
 const endGame = (score) => {
@@ -237,11 +244,11 @@ const setupScreenPoll = function() {
         ci.screenshot().then((imageData) => {
             screenshot = 'received';
             screenshotsMissed = 0;
+
             processScreenshot(imageData).then(
                 _score => {
                     score = _score;
                     if (score !== lastScore) {
-                        console.log (score);
                         if (isNaN(lastScore) && !isNaN(score)) {
                             emergeGamingSDK.startLevel();
                             console.log ("Game Started. Score: " + score)
@@ -260,7 +267,7 @@ const setupScreenPoll = function() {
 
 const startDosBox = () => {
     Dos(document.getElementById("axCanvas"), {
-        cycles: 500,
+        cycles: game.cycles,
         wdosboxUrl: '/assets/dosbox/wdosbox.js',
     }).ready((fs, main) => {
         fs.extract("/assets/games/digger.zip").then(() => {

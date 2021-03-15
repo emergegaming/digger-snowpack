@@ -5,17 +5,6 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="/css/index.css" />
     <title>Digger!</title>
-    <script>
-        console.log ("setup");
-        import {start} from '/js/index.js'
-        document.getElementById('startButton').addEventListener('click', () => {
-            console.log ('click');
-            start();
-
-        })
-
-    </script>
-
 </head>
 <body class="bg-black">
     <section ref="screen" class="relative">
@@ -43,27 +32,43 @@
         </div>
 
         <!-- Overlay to: Show when loading -->
-        <!--
-        <div class="flex orientation-notice fixed top-0 left-0 right-0 bottom-0 items-center justify-center z-30" v-if="loading" style="background-color: #101010">
-            <animation path="/animation/loading.json" style="width:640px; height:360px;"></animation>
+
+        <div id="loadingOverlay" class="flex orientation-notice fixed top-0 left-0 right-0 bottom-0 items-center justify-center z-30" v-if="loading" style="background-color: #101010">
+            <div class="text-white text-2xl">Loading...</div>
         </div>
-        -->
+
 
         <!-- Overlay to: Load and Start -->
 
-        <div class="flex fixed top-0 left-0 right-0 bottom-0 items-center justify-center z-40" style="background-color: #101010">
+        <div id="startButtonOverlay" class="flex fixed top-0 left-0 right-0 bottom-0 items-center justify-center z-40" style="background-color: #101010">
             <button id="startButton" class="text-white border border-white p-2 rounded-lg bg-red-900 cursor-pointer z-40">Load & Start!</button>
         </div>
 
 
         <!-- Overlay to: Show when orientation is portrait -->
-        <!--
+
         <div class="orientation-notice fixed hidden top-0 left-0 right-0 bottom-0 items-center justify-center z-50 pointer-events-none" style="background-color: #101010">
-            <animation path="/animation/rotate-screen.json" style="width:640px; height:360px;"></animation>
+            <div class="text-white text-2xl">Rotate landscape...</div>
         </div>
-        -->
+
 
     </section>
     <script src="/assets/dosbox/js-dos.js"></script>
+    <script type="module">
+        import {start, loadingComplete} from '/js/index.js'
+        let startButton = document.getElementById('startButton');
+        let startButtonOverlay = document.getElementById('startButtonOverlay');
+        let loadingOverlay = document.getElementById('loadingOverlay');
+        window.addEventListener('load', () => {
+            startButton.addEventListener('click', () => {
+                startButtonOverlay.classList.add('hidden')
+                start();
+            })
+            loadingComplete(function() {
+                loadingOverlay.classList.add('hidden');
+            })
+        });
+
+    </script>
 </body>
 </html>

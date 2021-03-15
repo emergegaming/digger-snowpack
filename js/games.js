@@ -6,7 +6,7 @@ export const games = {
         title:'Digger',
         path: '/games/dos/digger.zip',
         commands: ['-c', 'DIGGER.COM'],
-        cycles:400,
+        cycles:600,
         directions: 4,
         keys: {
             'up':{ascii:38},

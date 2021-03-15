@@ -18,7 +18,7 @@ export const setupOcr = (_startX, _startY, _charWidth, _charHeight, _charSpacing
 export const processScreenshot = (_imageData) => {
 
     return new Promise((resolve, reject) => {
-
+        console.time("ocr")
         let stack = [];
         let scoreChars = [];
         let scoreString = '';
@@ -38,6 +38,7 @@ export const processScreenshot = (_imageData) => {
                 }
             })
             let numericScore = parseInt(scoreString, 10);
+            console.timeEnd("ocr")
             resolve(numericScore);
         });
 
