@@ -18,7 +18,6 @@ let loading = false;
 let started = false;
 let lastScore = NaN;
 let score =  NaN;
-// let currentKey = null
 let clickElements = [];
 
 let screenPoll = null;
@@ -29,7 +28,6 @@ let ci = {};
 
 const handleTouchEvent = (event) => {
     if (event.type === 'touchstart') {
-        console.log(event.changedTouches.length);
         for (let i = 0; i < event.changedTouches.length; i++) {
             let starting = event.changedTouches[i];
             if (starting.clientX < 200) {
@@ -126,7 +124,6 @@ const processDirectionChange = (was, is) => {
 }
 
 const simulateKeyPress = (button, pressed) => {
-    console.log (button)
     ci.simulateKeyEvent(game.keys[button].ascii, pressed)
 }
 
@@ -135,7 +132,11 @@ const radToDeg = (rad) => {
 }
 
 const init = () => {
-    loading, started = true;
+    loading = true
+    started = true;
+}
+
+export const start = () => {
     if (game.ocrScore) {
         let startX = game.ocrScore.scoreX
         let startY = game.ocrScore.scoreY
@@ -146,8 +147,8 @@ const init = () => {
         let referenceChars = game.ocrScore.referenceChars;
         setupOcr(startX, startY, charWidth, charHeight, charSpacing, numChars, referenceChars);
     }
-
     startDosBox();
+
 }
 
 const unloadEvent = () => {

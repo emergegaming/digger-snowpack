@@ -5,6 +5,17 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="/css/index.css" />
     <title>Digger!</title>
+    <script>
+        console.log ("setup");
+        import {start} from '/js/index.js'
+        document.getElementById('startButton').addEventListener('click', () => {
+            console.log ('click');
+            start();
+
+        })
+
+    </script>
+
 </head>
 <body class="bg-black">
     <section ref="screen" class="relative">
@@ -39,11 +50,11 @@
         -->
 
         <!-- Overlay to: Load and Start -->
-        <!--
-        <div class="flex fixed top-0 left-0 right-0 bottom-0 items-center justify-center z-40" style="background-color: #101010" v-if="!started">
-            <button class="text-white border border-white p-2 rounded-lg bg-red-900 cursor-pointer z-40" @click="start()">Load & Start!</button>
+
+        <div class="flex fixed top-0 left-0 right-0 bottom-0 items-center justify-center z-40" style="background-color: #101010">
+            <button id="startButton" class="text-white border border-white p-2 rounded-lg bg-red-900 cursor-pointer z-40">Load & Start!</button>
         </div>
-        -->
+
 
         <!-- Overlay to: Show when orientation is portrait -->
         <!--
@@ -54,6 +65,5 @@
 
     </section>
     <script src="/assets/dosbox/js-dos.js"></script>
-    <script type="module" src="/js/index.js"></script>
 </body>
 </html>
