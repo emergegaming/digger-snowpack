@@ -12,12 +12,12 @@ const directionStart = {
 
 let lastDirection = [];
 let buttonsPressed = [];
-let loading = false;
-let started = false;
-let lastScore = NaN;
-let score =  NaN;
-let currentKey = null
-let elems = []
+// let loading = false;
+// let started = false;
+// let lastScore = NaN;
+// let score =  NaN;
+// let currentKey = null
+let clickElements = []
 
 
 let ci = {};
@@ -32,8 +32,8 @@ const handleTouchEvent = (event) => {
                 directionStart.y = starting.clientY;
                 directionStart.identifier = starting.identifier;
             } else {
-                for (let j = 0;j < elems.length; j++) {
-                    let elem = elems[i];
+                for (let j = 0;j < clickElements.length; j++) {
+                    let elem = clickElements[i];
                     let rect = elem.getBoundingClientRect();
                     let x1 = rect.x, x2 = rect.x + rect.width, y1 = rect.y, y2 = rect.y + rect.height;
                     if (starting.clientX > x1 && starting.clientX < x2 && starting.clientY > y1 && starting.clientY < y2) {
@@ -146,12 +146,12 @@ const dosReady = () => {
     window.addEventListener('beforeunload', unload)
 
     console.log ("Fetching elements");
-    elems = document.getElementsByClassName('axControl');
+    clickElements = document.getElementsByClassName('axControl');
 }
 
 const startDosBox = () => {
     Dos(document.getElementById("axCanvas"), {
-        cycles: 800,
+        cycles: 500,
         wdosboxUrl: '/assets/dosbox/wdosbox.js',
     }).ready((fs, main) => {
         fs.extract("/assets/games/digger.zip").then(() => {
