@@ -236,6 +236,10 @@ const setupScreenPoll = function() {
                         } else if (!isNaN(lastScore) && isNaN(score)) {
                             console.log ("Game Ended. Score: " + lastScore)
                             emergeGamingSDK.endLevel(lastScore);
+                            setTimeout(() => {
+                                unloadEvent();
+                                window.location.refresh();
+                            })
                         }
                         lastScore = score;
                     }
