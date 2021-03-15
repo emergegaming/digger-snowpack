@@ -1,4 +1,6 @@
 import {games} from "/js/games.js";
+import {processScreenshot, setupOcr} from "/js/ocr2.js";
+import {emergeGamingSDK} from "/js/emergamingSDK.js";
 
 const game = games.digger;
 
@@ -12,13 +14,16 @@ const directionStart = {
 
 let lastDirection = [];
 let buttonsPressed = [];
-// let loading = false;
-// let started = false;
-// let lastScore = NaN;
-// let score =  NaN;
+let loading = false;
+let started = false;
+let lastScore = NaN;
+let score =  NaN;
 // let currentKey = null
-let clickElements = []
+let clickElements = [];
 
+let screenPoll = null;
+let screenshot = null;
+let screenshotsMissed = null;
 
 let ci = {};
 
@@ -107,6 +112,7 @@ const handleTouchEvent = (event) => {
             }
         }
     }
+    event.stopImmediatePropagation();
     event.preventDefault()
 }
 
@@ -129,25 +135,116 @@ const radToDeg = (rad) => {
 }
 
 const init = () => {
+    loading, started = true;
+    if (game.ocrScore) {
+        let startX = game.ocrScore.scoreX
+        let startY = game.ocrScore.scoreY
+        let charWidth = game.ocrScore.charWidth
+        let charHeight = game.ocrScore.charHeight
+        let charSpacing = game.ocrScore.charSpacing
+        let numChars = game.ocrScore.numChars;
+        let referenceChars = game.ocrScore.referenceChars;
+        setupOcr(startX, startY, charWidth, charHeight, charSpacing, numChars, referenceChars);
+    }
+
     startDosBox();
 }
 
-const unload = () => {
+const unloadEvent = () => {
     if (ci) {
+        removeEventListeners()
         ci.exit();
     }
 }
 
-const dosReady = () => {
-    console.log ("Adding event listeners");
-    document.addEventListener('touchstart', handleTouchEvent);
-    document.addEventListener('touchend', handleTouchEvent);
-    document.addEventListener('touchmove', handleTouchEvent);
-    window.addEventListener('beforeunload', unload)
-
-    console.log ("Fetching elements");
-    clickElements = document.getElementsByClassName('axControl');
+const addEventListeners = () => {
+    if (isTouch()) {
+        document.addEventListener('touchstart', handleTouchEvent);
+        document.addEventListener('touchend', handleTouchEvent);
+        document.addEventListener('touchmove', handleTouchEvent);
+    } else {
+        if (game.remapKeys) document.addEventListener('keydown', handleKeyEvent);
+        if (game.remapKeys) document.addEventListener('keyup', handleKeyEvent);
+    }
+    window.addEventListener('beforeunload', unloadEvent)
 }
+
+const handleKeyEvent = (event) => {
+    if (event.keyCode in game.remapKeys) {
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        ci.simulateKeyEvent(game.remapKeys[event.keyCode], event.type === 'keydown');
+    }
+}
+
+const removeEventListeners = () => {
+    if (isTouch()) {
+        document.removeEventListener('touchstart', handleTouchEvent, false);
+        document.removeEventListener('touchend', handleTouchEvent, false);
+        document.removeEventListener('touchmove', handleTouchEvent, false);
+    } else {
+        window.removeEventListener('keydown', handleKeyEvent)
+        window.removeEventListener('keyup', handleKeyEvent)
+    }
+    window.removeEventListener('beforeunload', unloadEvent);
+
+}
+
+const isTouch = () => {
+    return (('ontouchstart' in window) ||
+        (navigator.maxTouchPoints > 0) ||
+        (navigator.msMaxTouchPoints > 0));
+}
+
+
+const dosReady = () => {
+    console.log ("Referencing controls");
+    clickElements = document.getElementsByClassName('axControl');
+
+    console.log ("Adding event listeners");
+    addEventListeners();
+
+    console.log ("Setting up scoring")
+    setupScreenPoll();
+}
+
+const setupScreenPoll = function() {
+    screenshot = null;
+    screenshotsMissed = 0;
+    screenPoll = setInterval(() => {
+        if (screenshot == null || screenshot === 'received') {
+            screenshot = 'sent';
+        } else {
+            screenshotsMissed++;
+            if (screenshotsMissed > 4) {
+                clearInterval(screenPoll);
+                unloadEvent()
+            }
+        }
+
+        ci.screenshot().then((imageData) => {
+            screenshot = 'received';
+            screenshotsMissed = 0;
+            processScreenshot(imageData).then(
+                _score => {
+                    score = _score;
+                    if (score !== lastScore) {
+                        console.log (score);
+                        if (isNaN(lastScore) && !isNaN(score)) {
+                            emergeGamingSDK.startLevel();
+                            console.log ("Game Started. Score: " + score)
+                        } else if (!isNaN(lastScore) && isNaN(score)) {
+                            console.log ("Game Ended. Score: " + lastScore)
+                            emergeGamingSDK.endLevel(lastScore);
+                        }
+                        lastScore = score;
+                    }
+                }
+            );
+        })
+    }, game.ocrScore.interval)
+}
+
 
 const startDosBox = () => {
     Dos(document.getElementById("axCanvas"), {
