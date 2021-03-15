@@ -208,6 +208,11 @@ const dosReady = () => {
     setupScreenPoll();
 }
 
+const endGame = () => {
+    clearInterval(screenPoll)
+    unloadEvent();
+}
+
 const setupScreenPoll = function() {
     screenshot = null;
     screenshotsMissed = 0;
@@ -217,8 +222,7 @@ const setupScreenPoll = function() {
         } else {
             screenshotsMissed++;
             if (screenshotsMissed > 4) {
-                clearInterval(screenPoll);
-                unloadEvent()
+                endGame(lastScore);
             }
         }
 
@@ -237,8 +241,7 @@ const setupScreenPoll = function() {
                             console.log ("Game Ended. Score: " + lastScore)
                             emergeGamingSDK.endLevel(lastScore);
                             setTimeout(() => {
-                                unloadEvent();
-                                window.location.refresh();
+                                endGame(score);
                             })
                         }
                         lastScore = score;
