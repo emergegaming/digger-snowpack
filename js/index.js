@@ -151,9 +151,13 @@ const init = () => {
 }
 
 const unloadEvent = () => {
+    removeEventListeners()
     if (ci) {
-        removeEventListeners()
+        try {
         ci.exit();
+        } catch (e) {
+            console.log ('Unload event failed');
+        }
     }
 }
 
@@ -208,8 +212,11 @@ const dosReady = () => {
     setupScreenPoll();
 }
 
-const endGame = () => {
+const endGame = (score) => {
+    console.log ("Ending game with score " + score)
+    emergeGamingSDK.endLevel(lastScore);
     clearInterval(screenPoll)
+    setTimeout(() => window.location.reload(), 500);
     unloadEvent();
 }
 
@@ -239,10 +246,7 @@ const setupScreenPoll = function() {
                             console.log ("Game Started. Score: " + score)
                         } else if (!isNaN(lastScore) && isNaN(score)) {
                             console.log ("Game Ended. Score: " + lastScore)
-                            emergeGamingSDK.endLevel(lastScore);
-                            setTimeout(() => {
-                                endGame(score);
-                            })
+                            endGame(score);
                         }
                         lastScore = score;
                     }
