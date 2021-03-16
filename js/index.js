@@ -213,7 +213,7 @@ const dosReady = () => {
     addEventListeners();
     setupScreenPoll();
     if (loadedCallback) loadedCallback();
-    emergeGamingSDK.endLevel(lastScore);
+    emergeGamingSDK.startLevel();
 }
 
 const endGame = (score) => {
