@@ -210,19 +210,16 @@ export const loadingComplete = (callback) => {
 const dosReady = () => {
 
     clickElements = document.getElementsByClassName('axControl');
-
-
     addEventListeners();
-
-
     setupScreenPoll();
     if (loadedCallback) loadedCallback();
+    emergeGamingSDK.endLevel(lastScore);
 }
 
 const endGame = (score) => {
     console.log ("Ending game with score " + score)
     emergeGamingSDK.endLevel(lastScore);
-    //setTimeout(() => location.reload(), 1500);
+    setTimeout(() => location.reload(), 500);
     clearInterval(screenPoll)
     unloadEvent();
 }
