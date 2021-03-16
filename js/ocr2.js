@@ -30,6 +30,7 @@ export const processScreenshot = (_imageData) => {
         }
 
         Promise.all(stack).then(() => {
+            console.time('compare')
             scoreChars.forEach(scoreChar => {
                 for (let i = 0; i < 10; i++) {
                     if (scoreChar === charData[i]) {
@@ -37,6 +38,7 @@ export const processScreenshot = (_imageData) => {
                     }
                 }
             })
+            console.timeEnd('compare')
             let numericScore = parseInt(scoreString, 10);
             console.timeEnd("ocr")
             resolve(numericScore);
@@ -51,6 +53,8 @@ export const getImageSignature = (_imageData, sourceX, sourceY, width, height) =
 
     return new Promise((resolve, reject) => {
 
+        console.time('generate')
+
         let i = new Image();
 
         i.onload = function() {
@@ -62,6 +66,9 @@ export const getImageSignature = (_imageData, sourceX, sourceY, width, height) =
             resolve (elem.toDataURL().substr(70));
         };
 
+
         i.src = _imageData;
+
+        console.timeEnd('generate')
     })
 }
