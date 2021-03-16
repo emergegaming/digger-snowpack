@@ -19,10 +19,10 @@ let started = false;
 let lastScore = NaN;
 let score =  NaN;
 let clickElements = [];
-
 let screenPoll = null;
 let screenshot = null;
 let screenshotsMissed = null;
+let lastScreenshot = null;
 
 let ci = {};
 let loadedCallback = function() {}
@@ -69,7 +69,7 @@ const handleTouchEvent = (event) => {
             }
         }
     } else if (event.type === 'touchmove') {
-        console.time('touch')
+
         for (let i = 0; i < event.changedTouches.length; i++) {
             let moving = event.changedTouches[i];
             if (moving.clientX < 200) {
@@ -108,7 +108,6 @@ const handleTouchEvent = (event) => {
 
                 processDirectionChange(lastDirection, control)
                 lastDirection = control;
-                console.timeEnd("touch")
             }
         }
     }
@@ -165,14 +164,14 @@ const unloadEvent = () => {
 }
 
 const addEventListeners = () => {
-    if (isTouch()) {
-        document.addEventListener('touchstart', handleTouchEvent);
-        document.addEventListener('touchend', handleTouchEvent);
-        document.addEventListener('touchmove', handleTouchEvent);
-    } else {
-        if (game.remapKeys) document.addEventListener('keydown', handleKeyEvent);
-        if (game.remapKeys) document.addEventListener('keyup', handleKeyEvent);
-    }
+
+    document.addEventListener('touchstart', handleTouchEvent);
+    document.addEventListener('touchend', handleTouchEvent);
+    document.addEventListener('touchmove', handleTouchEvent);
+
+    if (game.remapKeys) document.addEventListener('keydown', handleKeyEvent);
+    if (game.remapKeys) document.addEventListener('keyup', handleKeyEvent);
+
     window.addEventListener('beforeunload', unloadEvent)
 }
 
@@ -185,14 +184,14 @@ const handleKeyEvent = (event) => {
 }
 
 const removeEventListeners = () => {
-    if (isTouch()) {
-        document.removeEventListener('touchstart', handleTouchEvent, false);
-        document.removeEventListener('touchend', handleTouchEvent, false);
-        document.removeEventListener('touchmove', handleTouchEvent, false);
-    } else {
-        window.removeEventListener('keydown', handleKeyEvent)
-        window.removeEventListener('keyup', handleKeyEvent)
-    }
+
+    document.removeEventListener('touchstart', handleTouchEvent, false);
+    document.removeEventListener('touchend', handleTouchEvent, false);
+    document.removeEventListener('touchmove', handleTouchEvent, false);
+
+    window.removeEventListener('keydown', handleKeyEvent)
+    window.removeEventListener('keyup', handleKeyEvent)
+
     window.removeEventListener('beforeunload', unloadEvent);
 
 }
@@ -209,13 +208,13 @@ export const loadingComplete = (callback) => {
 
 
 const dosReady = () => {
-    console.log ("Referencing controls");
+
     clickElements = document.getElementsByClassName('axControl');
 
-    console.log ("Adding event listeners");
+
     addEventListeners();
 
-    console.log ("Setting up scoring")
+
     setupScreenPoll();
     if (loadedCallback) loadedCallback();
 }
@@ -223,8 +222,8 @@ const dosReady = () => {
 const endGame = (score) => {
     console.log ("Ending game with score " + score)
     emergeGamingSDK.endLevel(lastScore);
+    setTimeout(() => location.reload(), 500);
     clearInterval(screenPoll)
-    //setTimeout(() => window.location.reload(), 500);
     unloadEvent();
 }
 
@@ -237,29 +236,18 @@ const setupScreenPoll = function() {
         } else {
             screenshotsMissed++;
             if (screenshotsMissed > 4) {
-                endGame(lastScore);
+                processScreenshot(lastScreenshot).then(
+                    _score => {
+                        endGame(_score);
+                    }
+                );
             }
         }
 
         ci.screenshot().then((imageData) => {
+            lastScreenshot = imageData
             screenshot = 'received';
             screenshotsMissed = 0;
-
-            processScreenshot(imageData).then(
-                _score => {
-                    score = _score;
-                    if (score !== lastScore) {
-                        if (isNaN(lastScore) && !isNaN(score)) {
-                            emergeGamingSDK.startLevel();
-                            console.log ("Game Started. Score: " + score)
-                        } else if (!isNaN(lastScore) && isNaN(score)) {
-                            console.log ("Game Ended. Score: " + lastScore)
-                            endGame(score);
-                        }
-                        lastScore = score;
-                    }
-                }
-            );
         })
     }, game.ocrScore.interval)
 }
