@@ -222,7 +222,7 @@ const dosReady = () => {
 const endGame = (score) => {
     console.log ("Ending game with score " + score)
     emergeGamingSDK.endLevel(lastScore);
-    setTimeout(() => location.reload(), 1500);
+    //setTimeout(() => location.reload(), 1500);
     clearInterval(screenPoll)
     unloadEvent();
 }
