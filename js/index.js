@@ -212,13 +212,13 @@ const dosReady = () => {
     addEventListeners();
     setupScreenPoll();
     if (loadedCallback) loadedCallback();
-    console.log ("Start Level")
+    console.log ("Starting game")
     emergeGamingSDK.startLevel();
 }
 
 const endGame = (score) => {
     console.log ("Ending game with score " + score)
-    emergeGamingSDK.endLevel(lastScore);
+    emergeGamingSDK.endLevel(score);
     setTimeout(() => location.reload(), 500);
     clearInterval(screenPoll)
     unloadEvent();
