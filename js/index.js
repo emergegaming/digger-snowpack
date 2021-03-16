@@ -208,11 +208,11 @@ export const loadingComplete = (callback) => {
 
 
 const dosReady = () => {
-
     clickElements = document.getElementsByClassName('axControl');
     addEventListeners();
     setupScreenPoll();
     if (loadedCallback) loadedCallback();
+    console.log ("Start Level")
     emergeGamingSDK.startLevel();
 }
 
