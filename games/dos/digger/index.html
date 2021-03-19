@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="viewport" content="width=device-width;initial-scale:1.0">
     <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="/css/index.css" />
@@ -11,17 +12,19 @@
         <div class="fixed w-full h-full bg-black"></div>
         <div id="background" class="fixed w-full h-full opacity-50 z-10 bg-cover"></div>
         <div ref="gameScreen" id="gameScreen" class="fixed flex flex-row w-full h-full flex-grow items-center justify-center z-20">
+
             <!-- Left Column (Directional Control) -->
             <div class="flex flex-col flex-grow items-center justify-center pointer-events-none" v-if="isTouch">
                 <div class="relative flex w-32 h-32 items-center justify-center pointer-events-none">
                     <img class="absolute w-24 h-24 pointer-events-none" src="/assets/images/JoystickSurround.svg">
                     <img class="absolute w-32 h-32 pointer-events-none" src="/assets/images/Joystick.svg">
                 </div>
+                <img id="poo" src="" width="5" height="5" style="background-color: black">
             </div>
 
             <!-- Middle Column (Canvas) -->
             <div class="flex items-center justify-center text-white pointer-events-none">
-                <canvas id="axCanvas" ref="axCanvas" class="p-2 pointer-events-none bg-black"/>
+                <canvas id="axCanvas" class="p-2 pointer-events-none bg-black"></canvas>
             </div>
 
             <!-- Right Column (Buttons) -->
@@ -40,8 +43,12 @@
 
         <!-- Overlay to: Load and Start -->
 
-        <div id="startButtonOverlay" class="flex fixed top-0 left-0 right-0 bottom-0 items-center justify-center z-40" style="background-color: #101010">
-            <button id="startButton" class="text-white border border-white p-2 rounded-lg bg-red-900 cursor-pointer z-40">Load & Start!</button>
+        <div id="startButtonOverlay" class="flex flex-col fixed top-0 left-0 right-0 bottom-0 items-center justify-center z-40" style="background-color: #101010">
+            <div class="font-bold text-xl text-white text-center mb-2">Controls: </div>
+            <div class="text-xl text-white text-center">Arrow keys to Change Direction. Space bar to Fire<span></span></div>
+            <button id="startButton" class="text-white text-xl text-center border-2 border-white p-2 rounded-lg bg-red-900 cursor-pointer z-40 my-4">Load & Start!</button>
+            <div class="font-bold text-xl text-white mb-2">Instructions: </div>
+            <div class="text-xl text-white text-center px-4">Break open moneybags to expose gold. Collect gold and emeralds. Avoid Hobbins and Nobbins. Use your fireball cannon sparingly - it takes a few seconds to reload.</div>
         </div>
 
 

@@ -23,6 +23,7 @@ let screenPoll = null;
 let screenshot = null;
 let screenshotsMissed = null;
 let lastScreenshot = null;
+let canvas = null;
 
 let ci = {};
 let loadedCallback = function() {}
@@ -133,6 +134,7 @@ const radToDeg = (rad) => {
 }
 
 const init = () => {
+    canvas = document.getElementById("axCanvas");
     loading = true
     started = true;
 }
@@ -169,6 +171,8 @@ const addEventListeners = () => {
     document.addEventListener('touchend', handleTouchEvent);
     document.addEventListener('touchmove', handleTouchEvent);
 
+    console.log ("Adding key event listener:" + !!game.remapKeys)
+
     if (game.remapKeys) document.addEventListener('keydown', handleKeyEvent);
     if (game.remapKeys) document.addEventListener('keyup', handleKeyEvent);
 
@@ -176,10 +180,13 @@ const addEventListeners = () => {
 }
 
 const handleKeyEvent = (event) => {
-    if (event.keyCode in game.remapKeys) {
-        event.stopImmediatePropagation();
+    if (event.keyCode) {
         event.preventDefault();
-        ci.simulateKeyEvent(game.remapKeys[event.keyCode], event.type === 'keydown');
+        event.cancelBubble;
+        if (event.keyCode in game.remapKeys) {
+            ci.simulateKeyEvent(game.remapKeys[event.keyCode], event.type === 'keydown');
+        }
+        return false;
     }
 }
 
@@ -188,6 +195,8 @@ const removeEventListeners = () => {
     document.removeEventListener('touchstart', handleTouchEvent, false);
     document.removeEventListener('touchend', handleTouchEvent, false);
     document.removeEventListener('touchmove', handleTouchEvent, false);
+
+    console.log ("Removing key event listener")
 
     window.removeEventListener('keydown', handleKeyEvent)
     window.removeEventListener('keyup', handleKeyEvent)
@@ -227,7 +236,27 @@ const endGame = (score) => {
 const setupScreenPoll = function() {
     screenshot = null;
     screenshotsMissed = 0;
+    let canvasContext = canvas.getContext('2d');
     screenPoll = setInterval(() => {
+
+        let e = document.createElement('canvas');
+        let c = e.getContext('2d');
+        e.width = 1;
+        e.height = 1;
+
+        c.drawImage(canvas, 65, 0, 1, 1, 0, 0, 1, 1);
+        let data = e.toDataURL('image/png');
+        document.getElementById('poo').src = data;
+
+
+        //
+        //
+        // canvasContext.fillStyle='#FF0000';
+        // canvasContext.fillRect(20,0,1,1);
+        // let pixel = canvasContext.getImageData(20, 0, 1, 1);
+        // //console.log (canvasContext);
+        // console.log(pixel.data[0], pixel.data[1], pixel.data[2])
+
         if (screenshot == null || screenshot === 'received') {
             screenshot = 'sent';
         } else {
@@ -251,7 +280,7 @@ const setupScreenPoll = function() {
 
 
 const startDosBox = () => {
-    Dos(document.getElementById("axCanvas"), {
+    Dos(canvas, {
         cycles: game.cycles,
         wdosboxUrl: '/assets/dosbox/wdosbox.js',
     }).ready((fs, main) => {
