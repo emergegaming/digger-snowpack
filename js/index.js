@@ -242,18 +242,14 @@ const setupScreenPoll = function() {
         if (pixelData[0] === 85 && pixelData[1] === 255 && pixelData[2] === 255) {
             currentPixelColour = "blue";
             if (currentPixelColour !== lastPixelColour) {
-                console.log("Start");
-                //emergeGamingSDK.startLevel();
+                console.log ("Start: ");
+                emergeGamingSDK.startLevel();
             }
         } else if (pixelData[0] === 255 && pixelData[1] === 255 && pixelData[2] === 255) {
             if (currentPixelColour !== lastPixelColour) {
-                console.log("End");
                 processScreenshot(canvas.toDataURL('image/png')).then((_score) => {
-                    //emergeGamingSDK.endLevel(_score);
-                    console.log ("Score: " + _score);
-                    window.clearInterval(screenPoll);
+                    endGame(_score);
                 });
-
             }
         } else {
             currentPixelColour = "black"
