@@ -200,7 +200,6 @@ const removeEventListeners = () => {
 
     window.removeEventListener('keydown', handleKeyEvent)
     window.removeEventListener('keyup', handleKeyEvent)
-
     window.removeEventListener('beforeunload', unloadEvent);
 
 }
@@ -215,14 +214,11 @@ export const loadingComplete = (callback) => {
     loadedCallback = callback;
 }
 
-
 const dosReady = () => {
     clickElements = document.getElementsByClassName('axControl');
     addEventListeners();
     setupScreenPoll();
     if (loadedCallback) loadedCallback();
-    console.log ("Starting game")
-    emergeGamingSDK.startLevel();
 }
 
 const endGame = (score) => {
@@ -234,48 +230,38 @@ const endGame = (score) => {
 }
 
 const setupScreenPoll = function() {
-    screenshot = null;
-    screenshotsMissed = 0;
+
     let canvasContext = canvas.getContext('2d');
+    let lastPixelColour = null;
+
     screenPoll = setInterval(() => {
 
-        let e = document.createElement('canvas');
-        let c = e.getContext('2d');
-        e.width = 1;
-        e.height = 1;
+        let currentPixelColour = null
+        let pixelData = canvasContext.getImageData(65,0,1,1).data
 
-        c.drawImage(canvas, 65, 0, 1, 1, 0, 0, 1, 1);
-        let data = e.toDataURL('image/png');
-        document.getElementById('poo').src = data;
-
-
-        //
-        //
-        // canvasContext.fillStyle='#FF0000';
-        // canvasContext.fillRect(20,0,1,1);
-        // let pixel = canvasContext.getImageData(20, 0, 1, 1);
-        // //console.log (canvasContext);
-        // console.log(pixel.data[0], pixel.data[1], pixel.data[2])
-
-        if (screenshot == null || screenshot === 'received') {
-            screenshot = 'sent';
-        } else {
-            screenshotsMissed++;
-            if (screenshotsMissed > 4) {
-                processScreenshot(lastScreenshot).then(
-                    _score => {
-                        endGame(_score);
-                    }
-                );
+        if (pixelData[0] === 85 && pixelData[1] === 255 && pixelData[2] === 255) {
+            currentPixelColour = "blue";
+            if (currentPixelColour !== lastPixelColour) {
+                console.log("Start");
+                //emergeGamingSDK.startLevel();
             }
+        } else if (pixelData[0] === 255 && pixelData[1] === 255 && pixelData[2] === 255) {
+            if (currentPixelColour !== lastPixelColour) {
+                console.log("End");
+                processScreenshot(canvas.toDataURL('image/png')).then((_score) => {
+                    //emergeGamingSDK.endLevel(_score);
+                    console.log ("Score: " + _score);
+                    window.clearInterval(screenPoll);
+                });
+
+            }
+        } else {
+            currentPixelColour = "black"
         }
 
-        ci.screenshot().then((imageData) => {
-            lastScreenshot = imageData
-            screenshot = 'received';
-            screenshotsMissed = 0;
-        })
-    }, game.ocrScore.interval)
+        lastPixelColour = currentPixelColour;
+
+     }, game.ocrScore.interval);
 }
 
 
