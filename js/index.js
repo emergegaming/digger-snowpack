@@ -265,6 +265,8 @@ const startDosBox = () => {
     Dos(canvas, {
         cycles: game.cycles,
         wdosboxUrl: '/assets/dosbox/wdosbox.js',
+        onprogress: () => {},
+        log: () => {}
     }).ready((fs, main) => {
         fs.extract("/assets/games/digger.zip").then(() => {
             main(["-c", "DIGGER.COM"]).then((_ci) => {
